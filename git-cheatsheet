@@ -1,0 +1,156 @@
+--------------------------установка/обновление (Ubuntu)
+sudo add-apt-repository ppa:git-core/ppa
+sudo apt-get update
+sudo apt-get install git
+
+git --version
+--------------------------credentials
+--system - etc/gitconfig 
+--global - ~/.gitcinfig 
+--local(default) - project/.git/config
+
+git config --global user.name "darialissi" - установить глобально name
+git config --global user.email xx@gmail.com - установить глобально email
+git config --global core.editor gedit - настроить редактор по умолчанию
+git config --unset user.name - удалить параметр
+
+git config --list - посмотреть данные пользователя
+
+git config --global alias.c "config --global" - устанавливает алиас "с" для команды "config --global"
+
+git config --global pretty.my format:"%C(green)%h -%C(blue)%an | %s %C(red)%d" - алиас "my"
+	> git log --pretty=my
+
+git config --global init.defaultBranch main - установить имя main для основной ветки (вместо master)
+
+.gitignore - файл, где перечислены игнорируемые файлы/директории - тоже нужно коммитить!
+-------------------------
+@ - указатель HEAD
+~ - предыдущий коммит
+	@~ - указатель на родителя HEAD
+	@~2 - указатель на прародителя HEAD
+-------------------------lifecycle
+WORKING DIRECTORY > INDEX > REPOSITORY > REMOTE
+-------------------------project
+1. git init
+
+2. git add <file_name>
+   git add -A - добавить все файлы
+   git add . - добавить все файлы текущей директории
+   git add !<file_name> - все кроме указанного файла/директ
+   git add -p <file_name> - добавить файл частично
+   git status - отслеживаемые файлы в индексе
+   git reset <file_name> - удалить файл из add
+   git reset - удалить все из add
+   git restore --staged <file_name> - удалить файл из add
+   
+3. git commit - открывается текстовый редактор с изменениями > добавляем верхней строкой описание
+   git commit -m 'comment commit'
+   git commit --amend - изменение коммита (viz "commits")
+   
+4.git remote add <origin> <git@github.com:USERNAME/REPOSITORY-NAME.git>- настройка алиаса и подключение к удаленному репозиторию
+
+	git remote rename <origin> <mynewalias> - переименование удаленного репозитория
+	git remote remove <origin> - удаление репозитория
+	git remote — отобразить имена(алиасы) удаленных репозиториев
+
+5.git push <origin> <branch_name> - публикация на удаленный репозиторий
+после повторных изменений > git push
+
+git diff HEAD - различия в отслеживаемых файлах рабочей директории и последнего коммита
+git diff - различие индекса и рабочей директории
+git diff -- <file name> - различие индекса и рабочей директории в конкретном файле
+git diff --staged - различие индекса и последнего коммита
+git mv <name1> <name2> - переименовать файл
+rm -r .git - удаление локального репозитория
+-------------------------logs
+git reflog - коммиты с полной историей
+
+git log - коммиты для текущей ветки
+git log <branch_name> - коммиты для указанной ветки
+git log --all - коммиты для всего проекта
+git log --oneline - коммиты сокращенно
+git log --grep 'issue\d' - поиск по regex (регистрозависимый) в сообщениях коммитов
+git log --pretty=format:"%h -%an, %ar : %s"
+git log -<n> - только последних <n> коммитов
+git log -p - коммиты с diff
+git log --since='date>'- коммиты после указанной даты
+git log --until='date' - коммиты до указанной даты
+git log --author=''
+git log --committer=''
+git log -S <строка кода> - выводит коммит в котором была добавлена/удалена указанная строчка кода
+git show <номер коммита из лога> - инфо о коммите
+
+git diff <номер коммита 1> <номер коммита 2> - разница двух коммитов
+git diff <номер коммита 1>:<file name 1> <номер коммита 2>:<file name 2> - разница конкретных файлов в коммитах
+-----------------------branches
+git branch - локальные ветки
+git branch -a - локальные и удаленные ветки
+
+git branch --merged - основная ветка * и ветки, которые уже слиты в основную (их можно удалять)
+git branch --no-merged - основная ветка * и ветки, не слитые в основную со своими изменениями
+git branch <branch_name> - создать ветку
+git branch -d <branch_name> - удалить ветку локально
+git push <origin> --delete <branch_name> - удалить ветку на удаленном репозитории
+git push <origin>:<branch_name> — удалить ветку на удаленном репозитории
+
+git checkout <branch_name> - переключиться на ветку
+git checkout -b <branch_name> - создать и переключиться на новую ветку
+git checkout -b <branch_name(произвольное)> <origin/branch_name> - создать локальную ветку на основе ветки слежения
+
+git branch -u <origin/branch_name> - установить слежение данной ветки к указанной удаленной
+git branch -vv - показывает различия между ветками слежения и локальными ветками
+	git fetch --all; git branch -vv - сначала получает обновления для веток слежения, потом смотрит различия
+	
+git diff <branch_name 1> <branch_name 2> - разница двух веток
+------------------------remote
+git fetch - загружает изменения с удаленного репозитория, без слияния
+	git diff master remotes/origin/master - пример сравнения master ветки локального и удаленного репозитория
+	> git merge <branch_name> - соединяет изменения локального и удаленного репозитория в основной ветке локально (local repository is updated directly)
+	  x git rebase - перебазирует и переписывает историю коммитов (в отличии от merge, который сохраняет всю хронологию)
+	  	1. git checkout <branch_name>
+	  	2. git rebase <master> <branch_name> - перебазирование ветки относительно <master>, т.е. перемещение к концу master
+	  	3. git push -f - т.к. история коммитов изменена
+	  
+git pull - fetch + merge (!!!сразу удаляет изменения локального репозитория при конфликте версий)
+
+git push <origin> <branch_name> - публикует изменения в удаленный репозиторий
+
+git clone <https://github.com/USERNAME/REPOSITORY-NAME.git> - копия удаленного репозитория	
+-----------------------commits
+git checkout - отменить все локальные незакоммиченные изменения
+git checkout -- <file_name> - отменить все локальные незакоммиченные изменения конкретного файла
+
+git checkout <номер коммита из лога> <file_name(необязат)> - переключиться на конкретный коммит/состояние файла
+
+git revert <номер коммита из лога> - отменить коммит
+
+откат проекта/файла к конкретному коммиту
+	1. откат к коммиту и удаление изменений из индекса и рабочей директории локально
+		git checkout -f <номер коммита из лога - HEAD по умолчанию> <file_name(необязат)>
+		git reset --hard <номер коммита из лога - HEAD по умолчанию> <file_name(необязат)>
+	2. удаление неотслеживаемых файлов/директорий
+		git clean -di
+	3. публикация на удаленный сервер с потерей новых коммитов
+		git push -f
+
+откат проекта к конкретному коммиту с сохранением в отдельной ветке
+	1. создание ветки и переключение для сохранения изменений текущего последнего коммита
+		git checkout -b <branch name>
+		git branch <branch name> + git checkout <branch name> - сдвиг HEAD
+	2. перенос ветки [master] назад к коммиту
+		git branch -f master <номер коммита из лога>
+		git checkout -B master <номер коммита из лога>
+
+"редактирование" коммита
+1 вариант
+	git reset --soft <номер коммита из лога - HEAD по умолчанию> - передвигает указатель, но оставляет текущие рабочую директорию и индекс
+		> git commit -с ORIG_HEAD - новый коммит, все последующие становятся недосягаемыми
+2 вариант - только для последнего коммита
+	git commit --amend
+
+git stash - скрыть незакомиченные изменения
+	git stash pop - добавить изменения (независимо от ветки)
+	https://www.youtube.com/watch?v=KxKjBneF_NI&list=PLDyvV36pndZFHXjXuwA_NywNrVQO0aQqb&index=13
+
+
