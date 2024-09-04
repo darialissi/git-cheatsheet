@@ -154,7 +154,7 @@ git stash - скрыть незакомиченные изменения
 	git stash pop - добавить изменения (независимо от ветки)
 	https://www.youtube.com/watch?v=KxKjBneF_NI&list=PLDyvV36pndZFHXjXuwA_NywNrVQO0aQqb&index=13
 	
-сжатие коммитов - объединение
+сжатие коммитов / объединение
 1 вариант
 	git rebase -i HEAD~3
 		> откроется файл с коммитами: 1 строка - pick; далее заменяем pick на squash у коммитов, которые хотим объединить
